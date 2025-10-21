@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabaseClient"
 
+
 // Define proper TypeScript interfaces
 interface RawDataRow {
   customer_id?: string;
