@@ -62,6 +62,8 @@ export default function DataUpload() {
     if (res.includes("✅")) {
       setManualData({ customer_id: "", date: "", consumption_kwh: "" })
       setShowManualEntry(false)
+      window.location.reload();
+      window.location.reload();
     }
   }
 
