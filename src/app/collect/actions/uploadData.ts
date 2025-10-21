@@ -2,20 +2,33 @@
 
 import { supabase } from "@/lib/supabaseClient"
 
-export default async function uploadData(rows: any[]) {
+// Define proper TypeScript interfaces
+interface RawDataRow {
+  customer_id?: string;
+  date?: string;
+  consumption_kwh?: string;
+}
+
+interface CleanDataRow {
+  customer_id: string;
+  date: string;
+  consumption_kwh: number;
+}
+
+export default async function uploadData(rows: RawDataRow[]) {
   try {
     // Filter and validate rows
-    const cleanRows = rows
-      .filter((r) => r.customer_id && r.date && r.consumption_kwh)
-      .map((r) => {
+    const cleanRows: CleanDataRow[] = rows
+      .filter((r: RawDataRow) => r.customer_id && r.date && r.consumption_kwh)
+      .map((r: RawDataRow) => {
         // Validate date
-        const date = new Date(r.date)
+        const date = new Date(r.date!)
         if (isNaN(date.getTime())) {
           throw new Error(`Invalid date format: ${r.date}`)
         }
 
         // Validate consumption
-        const consumption = parseFloat(r.consumption_kwh)
+        const consumption = parseFloat(r.consumption_kwh!)
         if (isNaN(consumption) || consumption < 0) {
           throw new Error(`Invalid consumption value: ${r.consumption_kwh}`)
         }
@@ -40,8 +53,9 @@ export default async function uploadData(rows: any[]) {
     }
 
     return `✅ Successfully uploaded ${cleanRows.length} record(s)!`
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Upload error:", err)
-    return `❌ Failed to upload data: ${err.message}`
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+    return `❌ Failed to upload data: ${errorMessage}`
   }
 }

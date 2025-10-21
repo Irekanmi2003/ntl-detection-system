@@ -23,14 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-        <html lang="en">
-          <head>
-            {/* ✅ Load TailwindCSS from jsDelivr */}
-            <script src="https://cdn.tailwindcss.com"></script>
-          </head>
-          <body className="bg-gray-50 text-gray-800">
-            {children}
-          </body>
-        </html>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        {/* Load TailwindCSS asynchronously */}
+        <script
+          src="https://cdn.tailwindcss.com"
+          async
+          defer
+        ></script>
+      </head>
+      <body className="bg-gray-50 text-gray-800 font-sans">
+        {children}
+      </body>
+    </html>
   );
 }

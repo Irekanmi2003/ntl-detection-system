@@ -4,6 +4,13 @@ import { useState } from "react"
 import Papa from "papaparse"
 import uploadData from "../actions/uploadData"
 
+// Define the same interface as in uploadData.ts
+interface RawDataRow {
+  customer_id?: string;
+  date?: string;
+  consumption_kwh?: string;
+}
+
 export default function DataUpload() {
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -23,11 +30,17 @@ export default function DataUpload() {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        const rows = results.data
+        // Type assertion to RawDataRow[]
+        const rows = results.data as RawDataRow[]
         const res = await uploadData(rows)
         setMessage(res)
         setUploading(false)
       },
+      error: (error) => {
+        console.error("CSV parsing error:", error)
+        setMessage("❌ Failed to parse CSV file")
+        setUploading(false)
+      }
     })
   }
 
@@ -35,7 +48,14 @@ export default function DataUpload() {
     e.preventDefault()
     setUploading(true)
 
-    const res = await uploadData([manualData])
+    // Convert manualData to RawDataRow format
+    const manualRow: RawDataRow = {
+      customer_id: manualData.customer_id,
+      date: manualData.date,
+      consumption_kwh: manualData.consumption_kwh
+    }
+
+    const res = await uploadData([manualRow])
     setMessage(res)
     setUploading(false)
 
